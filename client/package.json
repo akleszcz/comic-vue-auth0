@@ -1,5 +1,5 @@
 {
-  "name": "comic-vue-auth0",
+  "name": "comic-vue-auth0-client",
   "version": "0.1.0",
   "private": true,
   "scripts": {

@@ -1,4 +1,4 @@
-# comic-vue-auth0
+# comic-vue-auth0-client
 
 ## Project setup
 ```
