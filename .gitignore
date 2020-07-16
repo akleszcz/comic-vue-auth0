@@ -24,4 +24,7 @@ pnpm-debug.log*
 # Terraform generated files
 .terraform
 
+# Auth0 secret data
+/terraform/variables.tf
+
 notes.md
