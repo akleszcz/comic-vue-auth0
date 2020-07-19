@@ -4,11 +4,12 @@ provider "auth0" {
   client_secret = var.client_secret
 }
 
-resource "auth0_client" "comic-client" {
+resource "auth0_client" "comic_client" {
   name        = "Comic Client"
   description = "Comic Application - Terraform generated"
   app_type    = "spa"
-  callbacks   = ["http://localhost:8081/callback", "https://${var.domain}/api/v2/callback"]
+  callbacks   = ["http://localhost:8081", "http://localhost:8080"]
+  allowed_logout_urls = ["http://localhost:8081"]
 
   oidc_conformant = true
 
