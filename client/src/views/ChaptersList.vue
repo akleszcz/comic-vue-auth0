@@ -5,17 +5,22 @@
   </div>
 </template>
 
-<script>
-import ChapterItem from "@/components/ChapterItem.vue";
+<script lang="ts">
+import { Component, Vue } from "vue-property-decorator";
 import { mapState } from "vuex";
-export default {
+import ChapterItem from "@/components/ChapterItem.vue";
+import { RootState } from "../typings/store"; // @ doesn't work for some reason
+
+@Component({
   components: {
     ChapterItem
   },
   computed: mapState({
-    chapters: state => state.chapters,
+    chapters: (state: RootState) => state.chapters,
   })
-};
+})
+export default class ChaptersList extends Vue {
+}
 </script>
 
 <style>
