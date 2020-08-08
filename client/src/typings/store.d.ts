@@ -1,9 +1,4 @@
-import { UserCategory } from "@/enums";
-
-interface Chapter {
-  title: string,
-  availableFor: UserCategory
-}
+import { Chapter } from ".";
 
 export interface RootState {
   chapters: Chapter[];

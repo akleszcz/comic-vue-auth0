@@ -8,7 +8,7 @@ resource "auth0_client" "comic_client" {
   name        = "Comic Client"
   description = "Comic Application - Terraform generated"
   app_type    = "spa"
-  callbacks   = ["http://localhost:8081", "http://localhost:8080"]
+  callbacks   = ["http://localhost:8081"]
   allowed_logout_urls = ["http://localhost:8081"]
 
   oidc_conformant = true

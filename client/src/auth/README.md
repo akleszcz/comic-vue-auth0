@@ -21,5 +21,5 @@ const DEFAULT_REDIRECT_CALLBACK = () =>
   window.history.replaceState({}, document.title, window.location.pathname);
 ```
 @TODO:
-https://html.spec.whatwg.org/multipage/history.html
+- https://html.spec.whatwg.org/multipage/history.html
 "Consider a game where the user can navigate along a line..."

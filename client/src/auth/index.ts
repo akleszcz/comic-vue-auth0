@@ -1,6 +1,15 @@
 import Vue from "vue";
-import createAuth0Client, { PopupLoginOptions, RedirectLoginOptions, GetIdTokenClaimsOptions, GetTokenSilentlyOptions, GetTokenWithPopupOptions, LogoutOptions, RedirectLoginResult } from "@auth0/auth0-spa-js";
-import { OnRedirectCallbackOptions, Auth0PluginData } from '@/typings/auth0';
+import createAuth0Client, {
+  PopupLoginOptions,
+  RedirectLoginOptions,
+  GetIdTokenClaimsOptions,
+  GetTokenSilentlyOptions,
+  GetTokenWithPopupOptions,
+  LogoutOptions,
+  RedirectLoginResult
+} from "@auth0/auth0-spa-js";
+import { OnRedirectCallbackOptions, Auth0PluginData } from "@/typings/auth0";
+import { PluginObject } from "vue/types/umd";
 
 const DEFAULT_REDIRECT_CALLBACK = () =>
   window.history.replaceState({}, document.title, window.location.pathname);
@@ -9,13 +18,21 @@ let instance: Vue;
 
 export const getInstance = () => instance;
 
-export const useAuth0 = ({
-  onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
-  redirectUri = window.location.origin,
-  domain,
-  clientId,
-  audience,
-}: OnRedirectCallbackOptions) => {
+export const useAuth0 = (
+  {
+    onRedirectCallback = DEFAULT_REDIRECT_CALLBACK,
+    redirectUri = window.location.origin,
+    domain,
+    clientId,
+    audience
+  }: OnRedirectCallbackOptions = {
+      onRedirectCallback: DEFAULT_REDIRECT_CALLBACK,
+      redirectUri: window.location.origin,
+      domain: "",
+      clientId: "",
+      audience: ""
+    }
+): Vue => {
   if (instance) return instance;
 
   instance = new Vue({
@@ -78,32 +95,34 @@ export const useAuth0 = ({
         return this.auth0Client?.logout(o);
       }
     },
-    
+
     async created() {
-      this.auth0Client = await createAuth0Client({
-        domain: domain,
-        client_id: clientId,
-        audience: audience,
-        redirect_uri: redirectUri
-      });
-
-      try {
-        if (
-          window.location.search.includes("code=") &&
-          window.location.search.includes("state=")
-        ) {
-
-          const { appState }: RedirectLoginResult = await this.auth0Client.handleRedirectCallback();
-
-          onRedirectCallback(appState);
+        this.auth0Client = await createAuth0Client({
+          domain: domain,
+          /* eslint-disable @typescript-eslint/camelcase */
+          client_id: clientId,
+          redirect_uri: redirectUri,
+          /* eslint-enable @typescript-eslint/camelcase */
+          audience: audience,
+        });
+        
+        try {
+          if (
+            window.location.search.includes("code=") &&
+            window.location.search.includes("state=")
+          ) {
+            const {
+              appState
+            }: RedirectLoginResult = await this.auth0Client.handleRedirectCallback();
+            onRedirectCallback(appState);
+          }
+        } catch (e) {
+          this.error = e;
+        } finally {
+          this.isAuthenticated = await this.auth0Client.isAuthenticated();
+          this.user = await this.auth0Client.getUser();
+          this.loading = false;
         }
-      } catch (e) {
-        this.error = e;
-      } finally {
-        this.isAuthenticated = await this.auth0Client.isAuthenticated();
-        this.user = await this.auth0Client.getUser();
-        this.loading = false;
-      }
     }
   });
 
@@ -111,15 +130,15 @@ export const useAuth0 = ({
 };
 
 // as described at https://vuejs.org/v2/guide/typescript.html#Augmenting-Types-for-Use-with-Plugins
-declare module 'vue/types/vue' {
-  interface Vue {
-    prototype: any,
-    $auth: string
-  }
-}
+// declare module 'vue/types/vue' {
+//   interface Vue {
+//     prototype: any,
+//     $auth: Vue
+//   }
+// }
 
-export const Auth0Plugin = {
-  install(VueClass: Vue, options: OnRedirectCallbackOptions) {
+export const Auth0Plugin: PluginObject<OnRedirectCallbackOptions> = {
+  install(VueClass: typeof Vue, options?: OnRedirectCallbackOptions) {
     VueClass.prototype.$auth = useAuth0(options);
   }
 };
